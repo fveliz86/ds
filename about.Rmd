@@ -1,0 +1,21 @@
+---
+title: "Sobre mí"
+---
+
+Soy sociólogo egresado de la Universidad de Buenos Aires (UBA). 
+</br>
+Actualmente finalizando la Maestría en Explotación de Datos y Descubrimiento del Conocimiento, también en la Universidad de Buenos Aires.
+</br>
+Tengo experiencia en modelos predictivos (machine learning), de tipo churn, fraude, y otras variantes de modelos para la industria financiera/bancaria. Con conocimiento y experiencia en sistemas de información geográfica, series temporales y sistemas de recomendación.
+</br>
+Me interesa particularmente aplicar la ciencia de datos al cruce entre la sociología y la economía.
+</br></br></br>
+
+I'm a sociologist graduated from the University of Buenos Aires (UBA).
+</br>
+Currently finishing a Master of Data Science at UBA.
+</br>
+I've experience in predictive modelling (machine learning), in particular in churn, fraud, and other types of models for the financial/banking industry. I've also experience and knowledge in geographical information systems, temporal series and recommender systems.
+</br>
+I'm specially interested in applying data science to the crossover of sociology and economics.
+</br>

@@ -1,0 +1,10 @@
+---
+title: "LinkedIn"
+---
+
+
+## Seleccionar idioma
+
+* <a href="https://www.linkedin.com/in/fernando-veliz/?locale=es_ES">Castellano</a>
+* <a href="https://www.linkedin.com/in/fernando-veliz/?locale=en_US">English</a>
+

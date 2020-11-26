@@ -1,0 +1,545 @@
+---
+title: "Ciclos de crecimiento económico."
+subtitle: "Un estudio comparativo de la Argentina y el Reino Unido a partir del análisis de señales"
+author: "Fernando Véliz"
+date: "21 de noviembre de 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+```{r, include=F}
+rm(list = ls())
+gc()
+
+library(readxl)
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(psych) 
+library(knitr)
+library(kableExtra)
+#library(rstudioapi)
+options(scipen=999)
+
+#setwd('C:/Users/fveliz/Documents/[Maestria]/2020.2 ST/TP')
+
+```
+
+
+Este documento se plantea como una síntesis del trabajo práctico elaborado para la materia Series Temporales dictada por el Dr. Marcelo Risk, en el marco de la Maestría de Explotación de Datos y Descubrimiento del Conocimiento de la UBA, titulado "Ciclos de crecimiento económico. Un estudio comparativo de la Argentina y el Reino Unido a partir del análisis de señales". Fue realizado junto al Lic. Sebastián Frittaoni.
+
+#INTRODUCCIÓN
+
+  El presente trabajo se plantea como objetivo caracterizar la evolución a lo largo del tiempo del PBI per cápita de Argentina y el Reino Unido, para el período 1875-2010 . En particular, se empleará la metodología del análisis de señales, tanto en el dominio del tiempo como en el dominio de la frecuencia, a partir de la trans-formación de la señal original mediante la transformada de Fourier, el filtrado mediante medias móviles, y el análisis de tiempo-frecuencia mediante la transformación de wavelets.
+<br/><br/>
+  La elección de ambos países estuvo dada por la estrecha relación económica, que tuvo su apogeo entre la segunda mitad del siglo XIX y la primera mitad del XX. Desde los ponchos fabricados en Manchester hasta el pacto Roca-Runciman, estas naciones experimentaron un intercambio comercial intenso, provechoso por igual a veces, pero en muchas ocasiones denunciado por perjudicial para nuestro país. Esperamos, por otro lado, encontrar comportamientos disímiles por cuanto ambas economías son estructuralmente diferentes: una, cuna del capitalismo industrial y potencia hegemónica hasta principios del siglo XX y la otra, focalizada en la exportación de recursos naturales, en particular, de origen agrícola, característica que, pese a intentos en sentido contrario, nunca dejó de primar.
+
+#MARCO TEÓRICO
+
+En la mayoría de las escuelas de teoría económica, sin importar su orientación, persiste el concepto de ciclo económico, como componente endógeno del capitalismo. Un primer acercamiento que podemos hacer es a partir del <i>entrepreneur</i> schumpeteriano, como aquel empresario que introduce innovaciones en el proceso productivo con el afan de obtener ganancias por fuera del circuito de acumulación, lo que explica la inestabilidad del capitalismo industrial. Este impulso hacia el avance tecnológico del emprendedor (la tan mentada <i>destrucción creativa</i>) es teorizado como innovación, en el que la acción del primer empresario es seguida por un enjambre de imitadores. Los ciclos económicos aparecen, entonces, como corolario de este fenómeno, en la forma de fluctuaciones recurrentes de la tasa en la cual las innovaciones son introducidas en la economía. Partiendo de este marco, nos concentramos en analizar 4 ciclos económicos distintivos, que difieren en su duración y en sus características:
+<br/>
+
+* Ciclos de Kitchin: duran entre 3 y 5 años. Se producen por ajustes de inventarios a partir del mayor o menor uso de la capacidad instalada.
+<br/>
+
+* Ciclos de Juglar: duran entre 7 y 11 años. Se producen por cambios en la inversión de capital fijo.
+<br/>
+
+* Ciclos de Kuznets: duran entre 15 y 25 años. Se producen por movimientos demográficos e inversión en infraestructura.
+<br/>
+
+* Ciclos de Kondratiev: duran alrededor de 50 años. Se producen por cambios significativos a nivel tecnológico.
+
+<br/>
+Para el caso particular de la Argentina, diversos autores como Diamand y Braun señalan la existencia, a partir de mediados de siglo XX hasta mediados de 1970, de un comportamiento cíclico denominado <i>“stop and go”</i>. En este sentido, en la Argentina, a partir de la crisis de 1930 del sistema capitalista en general, y por ende del modelo agroexportador imperante en el país, se llevó a cabo un proceso de industrialización centrado en un primer momento en bienes de consumo no durables que ya no podían ser importados, debido a la caída del comercio internacional. Esto produce el surgimiento de una <b>estructura productiva desequilibrada</b>, que consta de:
+<br/>
+
+* un sector agropecuario con mayor productividad relativa, competitivo a nivel internacional y por lo tanto generador de divisas
+<br/>
+
+* un sector industrial con menor productividad relativa, no competitivo a nivel internacional y consumidor neto de divisas
+<br/>
+
+Esta característica propia de la industrialización argentina genera una dinámica de crecimiento trabado, produciendo un comportamiento cíclico de aproximadamente 4 años de la economía argentina, dividido en una etapa ascendente (go) y una etapa descendente (stop). 
+<br/>
+
+* En la primera etapa hay expansión de la actividad económica, con crecimiento de la producción industrial y del consumo, a partir del aumento de los salarios reales.
+<br/>
+
+* En cierto momento, a partir de un aumento de las importaciones, por el crecimiento de la actividad industrial no acompañado por un incremento en los montos exportables, se produce una crisis de la balanza de pagos que se expresa, a su vez, en una caída de las reservas del Banco Central. En este punto, se lleva a cabo una devaluación de la moneda que tiene efectos inflacionarios, contractivos en cuanto a la actividad y regresivos con respecto a la distribución del ingreso. 
+<br/>
+
+* La fase descendente comienza con una <b>variación en el tipo de cambio</b>. Por esta razón, aumenta el precio de los productos agropecuarios, al obtener mayor cantidad de pesos en el comercio internacional, y los productos industriales se encarecen por el encarecimiento de los insumos importados. Por lo tanto, se produce un descenso en los salarios reales, originando una transferencia de ingresos al sector exportador. Finalmente, la caída de la demanda agregada ocasiona una caída en la producción industrial y, por ende, en el nivel de las importaciones. Con el consiguiente aumento de divisas, <b>la economía está en condiciones de empezar un nuevo ciclo.</b>
+<br/>
+<br/>
+
+#DESARROLLO
+###ANÁLISIS EN EL DOMINIO DEL TIEMPO
+```{r,include=F, warning=F}
+
+df<-read_xlsx('gdp-per-capita-clio-infra.xlsx')
+df<-df[,c(1,3,4)]
+colnames(df)<-c('Country','Year','GDP')
+df$Country<-as.factor(df$Country)
+
+
+df_pais<-list()
+df_pais[[1]]<-df %>% filter(Country=='Argentina',Year>=1875)
+df_pais[[2]]<-df %>% filter(Country=='United Kingdom',Year>=1875)
+
+nombres<-c('Argentina','Reino Unido')
+for (i in 1:2){
+  df_pais[[i]]$GDP_ev<-0
+  for (j in 2:nrow(df_pais[[i]])){
+    df_pais[[i]]$GDP_ev[j]<-df_pais[[i]]$GDP[j]/df_pais[[i]]$GDP[j-1]-1
+  }
+}
+
+
+```
+
+
+```{r,echo=F}
+i<-1
+df_pais[[i]] %>%
+          ggplot(aes(x=Year,y=GDP_ev)) +
+          geom_line()+
+          labs(x='Año',y='Variación del PBI per cápita',title=paste0('Variación interanual PBI per cápita - ',nombres[i]),subtitle='Período 1875-2010') +
+          scale_x_continuous(breaks=c(1875,seq(1880,2010,10)),limits = c(1875,2010), expand = c(0, 0))+
+          scale_y_continuous(breaks=seq(-0.2,0.2,0.05),labels=scales::percent)+
+          theme(panel.grid.minor = element_blank())+
+          theme(axis.text.x = element_text(angle = 45,hjust=1))
+```
+
+```{r,echo=F}
+i<-2
+df_pais[[i]] %>% 
+  ggplot(aes(x=Year,y=GDP_ev)) + 
+  geom_line()+
+  labs(x='Año',y='Variación del PBI per cápita',title=paste0('Variación interanual PBI per cápita - ',nombres[i]),subtitle='Período 1875-2010') +
+  scale_x_continuous(breaks=c(1875,seq(1880,2010,10)),limits = c(1875,2010), expand = c(0, 0))+
+  scale_y_continuous(breaks=seq(-0.1,0.1,0.025),labels=scales::percent)+
+  theme(panel.grid.minor = element_blank(),axis.text.x = element_text(angle = 45,hjust=1))
+  
+```
+
+```{r,echo=F}
+df_pais_aux<-rbind(df_pais[[1]],df_pais[[2]])
+
+df_pais_aux %>% 
+  ggplot(aes(x=Country,y=GDP_ev,fill=Country))  +
+  geom_boxplot()+
+  labs(x='País',y='Variación del PBI per cápita')+
+  theme(axis.ticks.x=element_blank(),
+        panel.grid = element_blank(),panel.grid.major.x = element_blank(),
+        legend.position = 'none')+
+  ggtitle ('Distribución de valores. Argentina vs Reino Unido')+
+  scale_y_continuous(breaks=seq(-0.2,0.2,0.05),labels=scales::percent)+
+  scale_x_discrete(labels=c('Argentina','Reino Unido'))+
+  stat_summary(fun=mean, geom="point", color='blue',size=2) +
+  #annotate(x=1,y=2.5)+
+  stat_summary(geom="text", fun=mean,
+               aes(label=paste0('Media: ',sprintf("%1.1f", ..y..*100))),
+               position=position_nudge(x=0.2,y=-0.005), size=3.5)+
+  stat_summary(geom="text", fun=median,
+               aes(label=paste0('Mediana: ',sprintf("%1.1f", ..y..*100))),
+               position=position_nudge(x=0.18,y=0.022), size=3.5) 
+```
+
+```{r,include=F}
+
+#por tipo de ciclo
+#cantidad, duración promedio, pico promedio, duración max, pico max
+ciclos<-list()
+for (i in 1:2){
+  #i<-1
+  der2<-as.data.frame(c(0,diff(sign(df_pais[[i]]$GDP_ev))))
+  colnames(der2)<-c('der2')
+  df_pais[[i]]<-cbind(df_pais[[i]],der2)
+  
+  j=1
+  df_pais[[i]]$ciclo=1
+  #Asignamos al primer año el ciclo del 2do
+  if (df_pais[[i]]$der2[2]>0){
+    df_pais[[i]]$tipo='Expansión'
+  }else
+  {  
+    df_pais[[i]]$tipo='Recesión'
+  }
+  for (k in 2:nrow(df_pais[[i]])){
+    if (df_pais[[i]]$der2[k] ==-2 || df_pais[[i]]$der2[k] ==2){
+      j=j+1
+      if (df_pais[[i]]$der2[k]>0){
+        df_pais[[i]]$tipo[k]='Expansión'
+      }else{
+        df_pais[[i]]$tipo[k]='Recesión'
+
+      }
+    }else{
+      df_pais[[i]]$tipo[k]=df_pais[[i]]$tipo[k-1]
+    }
+    df_pais[[i]]$ciclo[k]=j
+  }
+}
+for (i in 1:2){
+  ciclos[[i]]<-df_pais[[i]] %>% group_by(ciclo,tipo) %>% summarize(largo=n(),pico=max(abs(GDP_ev))) %>% 
+    mutate(depresion=case_when((tipo=='Recesión'& (largo>=3||pico>=0.10))~1,T~0)) %>% 
+    group_by(tipo) %>% summarize(cant=n(),largo_avg=mean(largo),pico_avg=mean(pico),largo_max=max(largo),pico_max=max(pico))
+  
+  depresiones<-df_pais[[i]] %>% group_by(ciclo,tipo) %>% summarize(largo=n(),pico=max(abs(GDP_ev))) %>% 
+    mutate(depresion=case_when((tipo=='Recesión'& (largo>=3||pico>=0.10))~1,T~0)) %>% filter(depresion==1) %>% 
+    group_by(tipo) %>% summarize(cant=n(),largo_avg=mean(largo),pico_avg=mean(pico),largo_max=max(largo),pico_max=max(pico))
+  depresiones$tipo<-'Recesión (depresión)'
+  ciclos[[i]]<-rbind(ciclos[[i]],depresiones)
+
+  ciclos[[i]][,c(4,6)]<-ciclos[[i]][,c(4,6)]*100
+  ciclos[[i]][,-1]<-round(ciclos[[i]][,-1],2)
+}
+
+```
+
+```{r,echo=F}
+columnas=c('Fase','Cantidad','Duración promedio (años)','Pico promedio (%)','Duración máxima (años)','Pico máximo (%)')
+colnames(ciclos[[1]])<-columnas
+ciclos[[1]] %>% kable(digits = 2,format.args = list(big.mark='.',decimal=','),caption = 'Fases de expansión y recesión. Argentina.') %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+colnames(ciclos[[2]])<-columnas
+ciclos[[2]] %>% kable(digits = 2,format.args = list(big.mark='.',decimal=','),caption = 'Fases de expansión y recesión. Reino Unido.') %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+```
+
+A priori, podemos distinguir algunas diferencias entre ambas series temporales. El primer dato que llama la atención es el promedio de crecimiento, levemente mayor en caso argentino frente al británico (1,6% vs 1,5%). Esta aparente inconsistencia respecto a lo que se esperaría encontrar en una economía subdesarrollada versus una desarrollada es explicada si contemplamos la existencia de una fuerte dispersión de los datos, alrededor del doble en el primer caso frente al segundo (desvío estándar de 6,3% vs. 3%). Así, mientras que el 50% central de la distribución de valores de la serie del Reino Unido se ubica en valores positivos (0 a 3,2%), en el caso argentino incluye también valores negativos (-2,4% a 5,5%). Asimismo, la mediana británica es levemente superior a su contraparte argentina: 2% vs 1,9%. La amplitud de valores implica, además, la existencia de outliers mucho más pronunciados en el caso argentino (rango de 22,3% a -21,3% vs 9,5% a -10,8%).
+</br></br>
+Podemos, por otro lado, realizar un análisis de las fases de expansión (períodos de crecimiento del PBI) y recesión (períodos de caída del PBI) por las que pasaron ambas economías. Tanto los períodos expansivos como recesivos parecen ser más cortos e intensos en el caso argentino, y más largos y matizados en el británico. En el caso británico, el período de mayor prosperidad se ubicó entre 1959 y 1973, lo que está asociado a la edad dorada del capitalismo de posguerra, mientras que la mayor recesión se ubicó entre 1875 y 1879, asociada a la Gran Depresión de 1873. Si nos concentramos en particular en las depresiones económicas, entendidas como un tipo de recesión que se extiende al menos durante 3 años o con una caída del 10% del PBI, encontramos dos puntos destacados: alrededor de 1919 con el fin de la Primera Guerra Mundial y en 1944-1947 con el fin de la Segunda Guerra Mundial. 
+</br></br>
+El caso argentino encuentra un correlato de prosperidad en el británico: el período más sostenido de crecimiento se dio en 1967-1974 . La crisis más larga se dio en el marco de la Primera Guerra Mundial, aunque de manera anticipada a RU, por efecto del incremento de las tasas de interés y una mala cosecha. La depresión más intensa se dio alrededor de 1897-1900 por una crisis de la balanza de pagos. Cabe destacar que las depresiones siguen un patrón similar respecto al caso británico que las recesiones: son un poco más cortas pero mucho más intensas (caídas promedio de -12% frente a -5%).
+</br></br>
+Como dato adicional, destacamos que el crecimiento total de las series muestra, para el caso argentino, un incremento de 527%, mientras que para el británico uno de 592%. En este sentido, las diferencias de PBI per cápita ya existentes al principio del período para Reino Unido-Argentina (U\$S1.400 vs U\$S1.600, o 2,1 veces) se agudizan al final (U\$S23.800 vs U$S10.300, o 2,3 veces).
+</br></br>
+
+###ANÁLISIS EN EL DOMINIO DE LA FRECUENCIA
+
+```{r,echo=F}
+fft_df_agrupado<-list()
+energia<-list()
+
+for (i in 1:2){
+  #i<-2
+  fft_df=fft(df_pais[[i]]$GDP_ev)
+  fft_df<-as.data.frame(Mod(fft_df))
+  fft_df$Freq<-as.numeric(rownames(fft_df))-1
+  fft_df$Ciclo<-nrow(df_pais[[i]])/fft_df$Freq
+  colnames(fft_df)[1]<-'mod'
+  #Visualizamos frecuencias
+  
+  print(fft_df %>%  
+    ggplot(aes(x=Freq,y=mod))+
+    geom_line()+
+    labs(x='Frecuencia',y='Energía (módulo)',title = paste0('Variación interanual del PBI per Cápita - ',nombres[i]),subtitle = 'Frecuencias')+
+    theme(panel.grid.minor.x = element_blank()))
+
+  #Energía total en el dominio de la frecuencia
+  energia[[i]]<-sum(fft_df$mod^2)/nrow(df_pais[[i]])
+  fft_df$prop<-(fft_df$mod^2/nrow(df_pais[[i]])) /energia[[i]]
+
+  #Ploteamos por ciclos en años
+  fft_df2<-fft_df %>% filter(Freq<=68)
+  #Contemplamos solo los ciclos de 3 años o más (el resto sería ruido)
+  fft_df2<-fft_df2 %>% mutate(mod=case_when((Freq==68 | Freq==0)~mod,T~mod*2),
+                              prop=case_when((Freq==68 | Freq==0)~prop,T~prop*2))
+  
+  print(fft_df2 [is.finite(fft_df$Ciclo),] %>% 
+    filter(Freq<46) %>% 
+    ggplot(aes(x=Freq,y=mod))+
+    geom_line()+
+    scale_x_reverse(breaks=c(round(136/2,0),round(136/3,0),round(136/5,0),round(136/7,0),round(136/11,0),round(136/15,0),round(136/25,0),round(136/40,0),round(136/100,0)),
+                    labels=c(2,3,5,7,11,15,25,40,100))+
+    labs(x='Ciclo (años)',y='Energía (módulo)',title = paste0('Variación interanual del PBI per Cápita - ',nombres[i]),subtitle = 'Ciclos (en años)')+
+    theme(panel.grid.minor.x = element_blank()))
+
+  #Energía por tipo de ciclo
+  
+  fft_df3<-fft_df2 %>% 
+    mutate(Ciclo2=case_when(!is.finite(Ciclo)~'Promedio (Freq 0)',  Ciclo>=3&Ciclo<=5~'1 - Kitchin (3-5)',Ciclo>5&Ciclo<7~'2 - Int (5-7)',Ciclo>=7&Ciclo<=11~'3 - Juglar (7-11)',
+                            Ciclo>11&Ciclo<15~'4 - Int (11-15)',Ciclo>=15&Ciclo<=25~'5 - Kuznets (15-25)',Ciclo>25&Ciclo<40~'6 - Int (25-40)',Ciclo>=40&Ciclo<=70~'7 - Kondratiev (40-70)',T~'Ruido'))
+  
+  fft_df_agrupado[[i]]<-fft_df3 %>% group_by(Ciclo2) %>%  summarize(suma_prop=sum(prop)) 
+  fft_df_agrupado[[i]]$suma_prop<-round(fft_df_agrupado[[i]]$suma_prop*100,1)
+  
+}
+```
+
+
+```{r,echo=F}
+energia_df<-cbind(energia[[1]],energia[[2]])
+colnames(energia_df)<-c('Argentina','Reino Unido')
+energia_df %>% kable(digits = 2,format.args = list(big.mark='.',decimal=','),caption = 'Energía total. Argentina y Reino Unido.') %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+
+fft_df_agrupado_final<-cbind(fft_df_agrupado[[1]],fft_df_agrupado[[2]]$suma_prop)
+colnames(fft_df_agrupado_final)<-c('Ciclo','Argentina','Reino Unido')
+fft_df_agrupado_final$Diferencia=fft_df_agrupado_final$`Reino Unido`-fft_df_agrupado_final$Argentina
+
+fft_df_agrupado_final %>% kable(digits = 1,format.args = list(big.mark='.',decimal=','),caption = 'Distribución de energía según ciclos. Argentina y Reino Unido.') %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+  Un análisis típico en el procesamiento de señales consiste en efectuar la Transformada de Fourier, para convertir una señal originada en el dominio del tiempo al dominio de la frecuencia. 
+</br></br>
+	En nuestro análisis del caso argentino podemos apreciar una predominancia de las frecuencias altas, lo que es coherente con una mayor dispersión en los datos y la mayor cantidad de fases de expansión y recesión del PBI. Descontando la frecuencia 0, que nos hablaría del promedio de la serie, y las frecuencias muy altas, asociadas al ruido, podemos apreciar que las frecuencias aisladas más elevadas se encuentran en el terreno de los ciclos de Kitchin (3-5 años) y de stop and go y en un período -no teorizado- de los 11-15 años (intermedio entre Juglar y Kuznets). El caso británico, por su parte, muestra una predominancia de frecuencias más bajas, correspondientes a ciclos más largos. En particular, encontramos las mayores frecuencias en los ciclos de Juglar (7-11 años), seguidas por el período anterior de 5-7 años.
+</br></br>
+  Por otro lado, podemos sumar la proporción de la energía captada por cada uno de los tipos de ciclos económicos. Las conclusiones son similares al análisis anterior: en el caso argentino la mayor proporción de la energía esaptada por los ciclos de Kitchin, mientras que en el británico el ciclo siguiente, de 5 a 7 años es el más destacado. Finalmente, cabe destacar que la energía total de ambas series difiere notablemente, lo que va en línea con el comportamiento más errático de la serie argentina (0,58 vs 0,15). 
+</br></br>
+
+###AUTOCORRELACIÓN
+```{r,echo=F}
+#Autocorrelación
+par(mfrow=c(2,1))
+for (i in range(1:2)){
+  acf(df_pais[[i]]$GDP_ev,lag.max = nrow(df_pais[[i]]),main=paste0('Autocorrelación - ',nombres[i]))
+}
+```
+</br>
+En el análisis de autocorrelación de Argentina, observamos un solo lag significativo (negativo) igual a 8. Encontramos regularidades en el resto de los lags, lo que nos hablaría de la mayor aleatoriedad de la serie. La serie del Reino Unido muestra, por el contrario, un lag significativo predominante en 1, lo que nos hablaría de una mayor regularidad en la serie, y una serie de lags que, si bien no significativos, describen una forma sinusoidal, que podemos asociar a ciclos intermedios más claros.
+</br></br>
+
+###CORRELACIÓN CRUZADA ARGENTINA - REINO UNIDO
+
+```{r,echo=F, fig.width = 10, fig.height = 2}
+
+outMA3<-list()
+outMA9<-list()
+outMA18<-list()
+outMA54<-list()
+
+for (i in 1:2){
+  #FILTRO MEDIA MOVIL 3
+  outMA3[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/3,3), circular =TRUE)
+  #FILTRO MEDIA MOVIL 9
+  outMA9[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/9,9), circular =TRUE)
+  #FILTRO MEDIA MOVIL 18
+  outMA18[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/18,18), circular =TRUE)
+  #FILTRO MEDIA MOVIL 54
+  outMA54[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/54,54), circular =TRUE)
+}
+op = par(mfrow = c(1, 5))
+#Correlación cruzada Arg-RU según MA
+ccf(df_pais[[1]]$GDP_ev,df_pais[[2]]$GDP_ev, sub='Original',main='')
+#Ningún lag significativo
+#Con filtro MA3 - Arg
+ccf(outMA3[[1]],outMA3[[2]], sub='MA3',main='')
+#Con filtro MA9 - Arg
+ccf(outMA9[[1]],outMA9[[2]], sub='MA9',main='')
+#Con filtro MA18 - Arg
+ccf(outMA18[[1]],outMA18[[2]], sub='MA18',main='')
+#Con filtro MA54 - Arg
+ccf(outMA54[[1]],outMA54[[2]], sub='MA54',main='')
+mtext(expression(bold("Correlación cruzada - Argentina vs Reino Unido (con filtrado media móvil)")), side = 3, line = -2, outer = TRUE)
+
+```
+
+  Parecería, a priori, haber un desfasaje entre los ciclos económicos de ambas economías, en tanto la correlación cruzada de las series es significativa de forma negativa con un lag de 2 (la economía argentina cae 2 años después de que la británica suba, por ejemplo). Este comportamiento se verifica incluso con mayor intensidad al comparar los ciclos de distinta extensión, y es más notoria en los ciclos largos. Si bien nuestra hipótesis inicial de estrecha interrelación entre ambos países se ve debilitada, es por otro lado una consecuencia esperable de la disímil inserción de su economía mundial, y su dependencia variable de los ciclos mundiales económicos.
+
+</br>
+
+###ANÁLISIS DE TIEMPO-FRECUENCIA
+
+###DESCOMPOSICIÓN UTILIZANDO FILTRO DE MEDIA MÓVIL
+
+```{r,echo=F}
+
+outMA3<-list()
+outMA9<-list()
+outMA18<-list()
+outMA54<-list()
+
+for (i in 1:2){
+  #FILTRO MEDIA MOVIL 3
+  outMA3[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/3,3), circular =TRUE)
+  #FILTRO MEDIA MOVIL 9
+  outMA9[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/9,9), circular =TRUE)
+  #FILTRO MEDIA MOVIL 18
+  outMA18[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/18,18), circular =TRUE)
+  #FILTRO MEDIA MOVIL 54
+  outMA54[[i]] = stats::filter(df_pais[[i]]$GDP_ev,rep(1/54,54), circular =TRUE)
+  
+  df_ma<-df_pais[[i]] %>% dplyr::select(Year,GDP_ev)
+  df_ma$ma<-'Original'
+  df_ma_aux<-as.data.frame(cbind(df_pais[[i]]$Year,outMA3[[i]]-outMA9[[i]]))
+  colnames(df_ma_aux)<-c('Year','GDP_ev')
+  df_ma_aux$ma<-'MA3 - Kitchin'
+  df_ma<-rbind(df_ma,df_ma_aux)
+  df_ma_aux<-as.data.frame(cbind(df_pais[[i]]$Year,outMA9[[i]]-outMA18[[i]]))
+  colnames(df_ma_aux)<-c('Year','GDP_ev')
+  df_ma_aux$ma<-'MA9 - Juglar'
+  df_ma<-rbind(df_ma,df_ma_aux)
+  df_ma_aux<-as.data.frame(cbind(df_pais[[i]]$Year,outMA18[[i]]-outMA54[[i]]))
+  colnames(df_ma_aux)<-c('Year','GDP_ev')
+  df_ma_aux$ma<-'MA18 - Kuznets'
+  df_ma<-rbind(df_ma,df_ma_aux)
+  df_ma_aux<-as.data.frame(cbind(df_pais[[i]]$Year,outMA54[[i]]))
+  colnames(df_ma_aux)<-c('Year','GDP_ev')
+  df_ma_aux$ma<-'MA54 - Kondratiev'
+  df_ma<-rbind(df_ma,df_ma_aux)
+  
+  
+  df_ma$ma<-ordered(df_ma$ma,levels=c('Original', 'MA3 - Kitchin', 'MA9 - Juglar', 'MA18 - Kuznets', 'MA54 - Kondratiev'))
+  g<-df_ma %>% 
+    ggplot(aes(x=Year,y=GDP_ev)) + 
+    geom_line()+
+    labs(x='Año',y='Var',title=paste0('Variación interanual PBI per cápita según Medias Móviles - ',nombres[i]),subtitle='Período 1875-2010') +
+    scale_x_continuous(breaks=c(1875,seq(1880,2010,10)),limits = c(1875,2010), expand = c(0, 0))+
+    scale_y_continuous(labels=scales::percent)+
+    theme(panel.grid.minor = element_blank())+
+    theme(axis.text.x = element_text(angle = 45,hjust=1))+
+    facet_wrap(~ma,nrow = 5,ncol=1,scales='free_y')
+  print(g)
+  
+}
+```
+
+
+Dada la imposibilidad de aislar el componente estacional de las series (por tener una frecuencia anual), optamos por descomponer las series por medias móviles, para poder apreciar la evolución de cada tipo de ciclo económico a lo largo del tiempo. Para el caso argentino, apreciamos ciclos de Kitchin y Juglar más marcados para el período 1875-1930, y más sosegados para los 60 años siguientes. Esto iría a contramarcha de la teoría del Stop And Go ya reseñada, pero en línea con nuestro análisis de tiempo-frecuencia. La serie británica, por su parte, acusa recibo de período tumultuoso entre ambas guerras mundiales, con ciclos cortos e intermedios más destacados. Es interesante destacar el efecto de la tendencia para ambos países (ciclos de Kondratiev): mientras que el caso argentino comienza y termina con números elevados, con una leve ondulación en el medio, el caso británico muestra un crecimiento constante a lo largo de casi todo el siglo XX, con una suave caída a partir de la década del ‘80.
+</br></br>
+
+###COMPARACIÓN CON ÍNDICE “TÉRMINOS DEL INTERCAMBIO”
+
+```{r, echo=FALSE}
+
+
+df_ti<-read_xlsx('gycpi/gycpi/csv/gycpi-2011-01.xlsx')
+df_ti<-df_ti %>% select(Year,`Términos del intercambio`)
+colnames(df_ti)<-c('Year','TI')
+df_ti<-df_ti %>% filter(Year>=1900,Year<=2010)
+df_ti$Year<-as.numeric(df_ti$Year)
+df_ti$TI_ev<-0
+for (j in 2:nrow(df_ti)){
+  df_ti$TI_ev[j]<-df_ti$TI[j]/df_ti$TI[j-1]-1
+}
+
+g<-df_ti %>% 
+  ggplot(aes(x=Year,y=TI_ev)) + 
+  geom_line()+
+  labs(x='Año',y='Variación del índice TI',title=paste0('Variación interanual del índice Términos del Intercambio (TI)'),subtitle='Período 1900-2010') +
+  scale_x_continuous(breaks=seq(1900,2010,10),limits = c(1900,2010), expand = c(0, 0))+
+  scale_y_continuous(breaks=seq(-0.5,0.4,0.05),labels=scales::percent)+
+  theme(panel.grid.minor = element_blank())+
+  theme(axis.text.x = element_text(angle = 45,hjust=1))
+print(g)
+
+```
+
+```{r,echo=F}
+
+outMA3_ti = stats::filter(df_ti$TI_ev,rep(1/3,3), circular =TRUE)
+outMA9_ti = stats::filter(df_ti$TI_ev,rep(1/9,9), circular =TRUE)
+outMA18_ti = stats::filter(df_ti$TI_ev,rep(1/18,18), circular =TRUE)
+outMA54_ti = stats::filter(df_ti$TI_ev,rep(1/54,54), circular =TRUE)
+
+df_ma<-df_ti %>% dplyr::select(Year,TI_ev)
+df_ma$ma<-'Original'
+df_ma_aux<-as.data.frame(cbind(df_ti$Year,outMA3_ti-outMA9_ti))
+colnames(df_ma_aux)<-c('Year','TI_ev')
+df_ma_aux$ma<-'MA3 - Kitchin'
+df_ma<-rbind(df_ma,df_ma_aux)
+df_ma_aux<-as.data.frame(cbind(df_ti$Year,outMA9_ti-outMA18_ti))
+colnames(df_ma_aux)<-c('Year','TI_ev')
+df_ma_aux$ma<-'MA9 - Juglar'
+df_ma<-rbind(df_ma,df_ma_aux)
+df_ma_aux<-as.data.frame(cbind(df_ti$Year,outMA18_ti-outMA54_ti))
+colnames(df_ma_aux)<-c('Year','TI_ev')
+df_ma_aux$ma<-'MA18 - Kuznets'
+df_ma<-rbind(df_ma,df_ma_aux)
+df_ma_aux<-as.data.frame(cbind(df_ti$Year,outMA54_ti))
+colnames(df_ma_aux)<-c('Year','TI_ev')
+df_ma_aux$ma<-'MA54 - Kondratiev'
+df_ma<-rbind(df_ma,df_ma_aux)
+
+df_ma$ma<-ordered(df_ma$ma,levels=c('Original', 'MA3 - Kitchin', 'MA9 - Juglar', 'MA18 - Kuznets', 'MA54 - Kondratiev'))
+g<-df_ma %>% 
+  ggplot(aes(x=Year,y=TI_ev)) + 
+  geom_line()+
+  labs(x='Año',y='Var',title=paste0('Variación interanual de índice TI según Medias Móviles'),subtitle='Período 1900-2010') +
+  scale_x_continuous(breaks=seq(1900,2010,10),limits = c(1900,2010), expand = c(0, 0))+
+  scale_y_continuous(labels=scales::percent)+
+  theme(panel.grid.minor = element_blank())+
+  theme(axis.text.x = element_text(angle = 45,hjust=1))+
+  facet_wrap(~ma,nrow = 5,ncol=1,scales='free_y')
+
+print(g)
+```
+	
+```{r,fig.width=10,fig.height=2, echo=F}
+
+for (i in 1:2){
+  
+  op = par(mfrow = c(1, 5))
+  #Correlación cruzada con TI
+  df_f<-df_pais[[i]] %>% dplyr::filter(Year>=1900,Year<=2010)
+  ccf(df_f$GDP_ev,df_ti$TI_ev, sub='Original',main='')
+  #Con filtro MA3 - Arg
+  df_f<-as.data.frame(cbind(df_pais[[i]]$Year,outMA3[[i]]))
+  colnames(df_f)<-c('Year','var')
+  df_f<-df_f %>% dplyr::filter(Year>=1900,Year<=2010)
+  ccf(df_f$var,outMA3_ti, sub='MA3',main='')
+  #Con filtro MA9 - Arg
+  df_f<-as.data.frame(cbind(df_pais[[i]]$Year,outMA9[[i]]))
+  colnames(df_f)<-c('Year','var')
+  df_f<-df_f %>% dplyr::filter(Year>=1900,Year<=2010)
+  ccf(df_f$var,outMA9_ti, sub='MA9',main='')
+  #Con filtro MA18 - Arg
+  df_f<-as.data.frame(cbind(df_pais[[i]]$Year,outMA18[[i]]))
+  colnames(df_f)<-c('Year','var')
+  df_f<-df_f %>% dplyr::filter(Year>=1900,Year<=2010)
+  ccf(df_f$var,outMA18_ti, sub='MA18',main='')
+  #Con filtro MA54 - Arg
+  df_f<-as.data.frame(cbind(df_pais[[i]]$Year,outMA54[[i]]))
+  colnames(df_f)<-c('Year','var')
+  df_f<-df_f %>% dplyr::filter(Year>=1900,Year<=2010)
+  ccf(df_f$var,outMA54_ti, sub='MA54',main='')
+
+  if (i==1){
+    mtext(expression(bold("Correlación cruzada - Argentina - TI (con filtrado media móvil)")), side = 3, line = -2, outer = TRUE)
+  }else{
+    mtext(expression(bold("Correlación cruzada - Reino Unido - TI (con filtrado media móvil)")), side = 3, line = -2, outer = TRUE)
+  }
+}
+```
+
+Un análisis que consideramos puede ser fructífero es la comparación de la evolución de ambos países frente al índice de Términos del Intercambio (TI). Esto tiene sentido por cuanto la economía de los países subdesarrollados, y en particular de Argentina, ha estado basada durante gran parte del período analizado en la exportación de productos primarios, mientras que la de los países desarrollados, en particular Reino Unido, reposó sobre los productos industriales. El índice TI utilizado se basa en el ampliamente reconocido trabajo de Grilli y Yang (1988). El índice está compuesto de la siguiente manera: GYCPI/MUV, siendo GYCPI un índice agregado de precios de commodities (sin tener en cuenta el petróleo), y MUV un índice de los valores de las exportaciones de un conjunto de países industrializados. Vale decir, entonces, a mayor índice TI, mayor valor relativo de las commodities frente a los productos industriales.
+</br></br>
+	Sin entrar en un análisis pormenorizado de la serie, se aprecia un rango de movimientos mucho más amplio que en los países estudiados (entre -45% y 37%). El período de entreguerras (1920-1940) muestra oscilaciones muy abruptas, al igual que los años intermedios de la década del ‘70, probablemente como efecto colateral de la crisis del petróleo. Por otro lado, podemos corroborar la apreciación de Grilli y Yang respecto de la tendencia decreciente de los términos del intercambio en las primeras 8 décadas del siglo XX, tendencia, que, por otro lado, muestra claros signos de revertirse en la primera década del siglo XXI.
+</br></br>
+	Nos parece pertinente analizar la correlación cruzada entre las series de ambos países respecto al índice TI. Al comparar las series originales, prácticamente no surgen lags con una correlación significativa. Sin embargo, al comparar las series suavizadas por los filtros MA, aparecen correlaciones fuertes alrededor del lag 0: positivas para Argentina (en particular para los ciclos medios de 9 y 18 años), y negativas para Reino Unido (en particular para los ciclos medios-largos y largos). Esto se condice con la posición de ambos países en la economía mundial respecto a su condición de exportadores de productos primarios o industriales.
+	
+</br></br>
+
+#CONCLUSIONES
+
+
+* Argentina muestra un comportamiento más errático, con mayor predominancia e intensidad de los ciclos cortos de Kitchin
+* Este comportamiento se agudiza antes de la fase ISI, a contramano de lo esperado
+* Reino Unido muestra mayor energía en los ciclos intermedios de Juglar, y un comportamiento en general más suavizado luego de la Segunda Guerra Mundial
+* Hay evidencias de que ambas economías se correlacionan de forma negativa, en particular si comparamos los ciclos más largos
+* Nuestra hipótesis inicial respecto a la relación con la serie de Términos del Intercambio se ve confirmada: mientras que Argentina correlaciona positivamente en sus ciclos medios, Reino Unido lo hace negativamente, sobre todo en los ciclos medios-largos
+
+</br></br>
+
+#BIBLIOGRAFÍA
+
+*	Braun, O. (1975): Desarrollo del capital monopolista en la Argentina. En Braun, O. (comp.): El capita-lismo en crisis. Buenos Aires: Siglo XXI
+*	Diamand, M. (1973): Doctrinas económicas, desarrollo e independencia. Buenos Aires. Paidós.
+*	Grilli, Enzo, and Maw Cheng Yang. (1988): Primary Commodity Prices, Manufactured Goods Prices, and the Terms of Trade of Developing Countries: What the Long Run Shows. The World Bank Econo-mic Review 2 (1): 1–47
+*	https://clio-infra.eu/
+*	Kondratieff N. D. (1935): The Long Waves in Economic Life. The Review of Economic Statistics (p 105–115).
+*	Korotayev, Andrey V; Tsirel, Sergey V. (2010): A Spectral Analysis of World GDP Dynamics: Kon-dratieff Waves, Kuznets Swings, Juglar and Kitchin Cycles in Global Economic Development, and the 2008–2009 Economic Crisis. Structure and Dynamics (University of California)
+*	Mee, S. (2009): Joseph Schumpeter And The Business Cycle: An Historical Synthesis. Trinity College Dublin.
+*	Schumpeter, J. (1939): Business Cycles: A Theoretical, Historical, and Statistical Analysis of the Capi-talist Process. London: McGraw-Hill.

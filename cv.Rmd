@@ -1,0 +1,8 @@
+---
+title: "CV"
+---
+
+## Seleccionar idioma
+
+* <a href="cv/Véliz, Fernando - CV.pdf#" class="download" title="Castellano">Castellano</a>		
+* <a href="cv/Veliz, Fernando - CV (Eng).pdf" class="download" title="English">English</a>		

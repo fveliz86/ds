@@ -1,0 +1,7 @@
+---
+title: "Trabajos disponibles"
+---
+
+Maestría:
+
+* <a href="proyectos/tp_st/tp_st.html">TP Series Temporales</a>
