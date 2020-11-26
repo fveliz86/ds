@@ -4,7 +4,7 @@ navbar:
   title: "Fernando Véliz"                             
   type: inverse
   left:
-    - text: "Home"
+    - text: "Portfolio"
       icon: fa-home
       href: index.html
     - text: "Sobre mí"
