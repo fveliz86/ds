@@ -1,7 +1,8 @@
 ---
 title: "Sobre mí"
 ---
-
+![](foto_CV.png){#id .class width=20% height=20%}
+</br></br>
 Soy sociólogo egresado de la Universidad de Buenos Aires (UBA). 
 </br>
 Actualmente finalizando la Maestría en Explotación de Datos y Descubrimiento del Conocimiento, también en la Universidad de Buenos Aires.
