@@ -23,10 +23,11 @@ library(ggplot2)
 library(psych) 
 library(knitr)
 library(kableExtra)
+library(WaveletComp)
 #library(rstudioapi)
 options(scipen=999)
 
-#setwd('C:/Users/fveliz/Documents/[Maestria]/2020.2 ST/TP')
+setwd('C:/Users/fveliz/Documents/[Maestria]/2020.2 ST/TP')
 
 ```
 
@@ -351,6 +352,33 @@ mtext(expression(bold("Correlación cruzada - Argentina vs Reino Unido (con filt
 </br>
 
 ###ANÁLISIS DE TIEMPO-FRECUENCIA
+```{r,include=F,warning=F}
+my.w=list()
+for (i in (1:2)){
+  my.data <- data.frame(x = df_pais[[i]]$GDP_ev)
+  my.w[[i]] <- analyze.wavelet(my.data, "x",
+                          loess.span = 0,
+                          dt = 1, dj = 1/20,
+                          lowerPeriod = 2,
+                          upperPeriod = 64,
+                          make.pval = TRUE, n.sim = 10,verbose = F)
+}
+```
+
+```{r,echo=F}
+
+for (i in (1:2)){
+  wt.image(my.w[[i]], color.key = "quantile", n.levels = 250,
+           legend.params = list(lab = "wavelet power levels", mar = 4.7),main = paste0('Wavelet Power Spectrum - ',nombres[i]))
+}
+```
+
+Este tipo de análisis es de interés ya que permite analizar las componentes frecuenciales de las señales a lo largo del tiempo. En este sentido, para nuestro objetivo de estudio, nos permite dar cuenta de los períodos históricos donde determinados ciclos cobran mayor importancia. Para ello utilizamos el paquete de R Wavelet-Comp.
+</br></br>
+
+A partir de los gráficos podemos observar en primer lugar que, para la serie argentina, ningún ciclo per-dura demasiado en el tiempo habiendo una coexistencia de ciclos de distinto período al comienzo de la serie (figura [11]). A su vez, en relación con la teoría del stop and go si bien observamos la presencia de ciclos de entre 3 y 4 años de duración para el período de industrialización por sustitución de importaciones (ISI) entre 1945 y 1974, esta no es exclusiva de dicho momento y a su vez no se mantiene para todo el período. Por su parte, para el caso británico se puede observar una persistencia mucho mayor de los ciclos de Juglar en casi todo el siglo XX como también del ciclo -no teorizado- de entre 11-15 años al comienzo de la serie.
+
+</br>
 
 ###DESCOMPOSICIÓN UTILIZANDO FILTRO DE MEDIA MÓVIL
 
@@ -407,7 +435,9 @@ for (i in 1:2){
 ```
 
 
-Dada la imposibilidad de aislar el componente estacional de las series (por tener una frecuencia anual), optamos por descomponer las series por medias móviles, para poder apreciar la evolución de cada tipo de ciclo económico a lo largo del tiempo. Para el caso argentino, apreciamos ciclos de Kitchin y Juglar más marcados para el período 1875-1930, y más sosegados para los 60 años siguientes. Esto iría a contramarcha de la teoría del Stop And Go ya reseñada, pero en línea con nuestro análisis de tiempo-frecuencia. La serie británica, por su parte, acusa recibo de período tumultuoso entre ambas guerras mundiales, con ciclos cortos e intermedios más destacados. Es interesante destacar el efecto de la tendencia para ambos países (ciclos de Kondratiev): mientras que el caso argentino comienza y termina con números elevados, con una leve ondulación en el medio, el caso británico muestra un crecimiento constante a lo largo de casi todo el siglo XX, con una suave caída a partir de la década del ‘80.
+Dada la imposibilidad de aislar el componente estacional de las series (por tener una frecuencia anual), optamos por descomponer las series por medias móviles, para poder apreciar la evolución de cada tipo de ciclo económico a lo largo del tiempo. Para el caso argentino, apreciamos ciclos de Kitchin y Juglar más marcados para el período 1875-1930, y más sosegados para los 60 años siguientes. Esto iría a contramarcha de la teoría del Stop And Go ya reseñada, pero en línea con nuestro análisis de tiempo-frecuencia. 
+</br>
+La serie británica, por su parte, acusa recibo de período tumultuoso entre ambas guerras mundiales, con ciclos cortos e intermedios más destacados. Es interesante destacar el efecto de la tendencia para ambos países (ciclos de Kondratiev): mientras que el caso argentino comienza y termina con números elevados, con una leve ondulación en el medio, el caso británico muestra un crecimiento constante a lo largo de casi todo el siglo XX, con una suave caída a partir de la década del ‘80.
 </br></br>
 
 ###COMPARACIÓN CON ÍNDICE “TÉRMINOS DEL INTERCAMBIO”
