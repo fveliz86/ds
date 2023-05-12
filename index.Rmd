@@ -6,3 +6,4 @@
 * <a href="proyectos/tp_especialización/Véliz, Fernando - TP Especialización v2.pdf#" class="download">TP Especialización: "Modelo Predictivo de Puntajes de Lengua y Matemática"</a>
 </br></br>
 * <a href="https://aprender-predictor.herokuapp.com/">TP Especialización: "Modelo Predictivo de Puntajes de Lengua y Matemática" - Simulador de puntajes</a>
+* <a href="https://aprender-predictor.herokuapp.com/">lalala</a>
