@@ -37,7 +37,7 @@ class Tokenizer(object):
 # test_prueba='Hay oportunidades de buscar un cambio. Gracias por el entusiasmo'
 # test_prueba=test.loc[230,'texto']
 
-image_no_pred = Image.open(ruta+'./auxiliar/af.jpg')
+image_no_pred = Image.open('analisis_politico_app/auxiliar/af.jpg')
 st.image(image_no_pred, width=130,caption='Predicción')
 
 # image_no_pred = Image.open('auxiliar/af.jpg')
