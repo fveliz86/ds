@@ -40,7 +40,7 @@ class Tokenizer(object):
 image_no_pred = Image.open(ruta+'af.jpg')
 st.image(image_no_pred, width=130,caption='Predicción')
 
-image_no_pred = Image.open('./auxiliar/af.jpg')
+image_no_pred = Image.open('auxiliar/af.jpg')
 
 with open('auxiliar/vectorizer.pickle', 'rb') as handle:
     vectorizer = pickle.load(handle)
