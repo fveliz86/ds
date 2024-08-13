@@ -9,8 +9,8 @@ import os
 
 print(os.getcwd())
 
-dir = path.Path(__file__).abspath()
-sys.path.append(dir.parent.parent)
+# dir = path.Path(__file__).abspath()
+# sys.path.append(dir.parent.parent)
 
 class Tokenizer(object):
     def __init__(self,stopwords):
@@ -32,6 +32,8 @@ class Tokenizer(object):
 # test_prueba='Aquí aay allí debemos hacer todo el esfuerzo por la pandemia. Ver producción juramento'
 # test_prueba='Hay oportunidades de buscar un cambio. Gracias por el entusiasmo'
 # test_prueba=test.loc[230,'texto']
+
+image_no_pred = Image.open('af.jpg')
 
 image_no_pred = Image.open('./auxiliar/af.jpg')
 
