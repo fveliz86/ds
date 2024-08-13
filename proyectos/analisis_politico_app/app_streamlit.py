@@ -7,6 +7,9 @@ import random
 import pathlib
 import sklearn
 
+nltk.download('stopwords', quiet=True, raise_on_error=True)
+nltk.download('punkt')
+
 code_dir = pathlib.Path(__file__).parent.resolve()
 
 # print(code_dir)
