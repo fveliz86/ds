@@ -4,22 +4,10 @@ import pandas as pd
 import nltk
 from PIL import Image
 import random
-import path
-import os
-
-
 import pathlib
 code_dir = pathlib.Path(__file__).parent.resolve()
-st.text(code_dir)
 
-print(os.getcwd())
-# st.text(Path.cwd())
-st.text(os.getcwd())
-ruta=os.getcwd()
-# ruta="/mount/src/ds/proyectos/analisis_politico_app/"
-
-# dir = path.Path(__file__).abspath()
-# sys.path.append(dir.parent.parent)
+# print(code_dir)
 
 class Tokenizer(object):
     def __init__(self,stopwords):
@@ -42,11 +30,6 @@ class Tokenizer(object):
 # test_prueba='Hay oportunidades de buscar un cambio. Gracias por el entusiasmo'
 # test_prueba=test.loc[230,'texto']
 
-image_no_pred = Image.open(f'{code_dir}/auxiliar/af.jpg')
-st.image(image_no_pred, width=130,caption='Predicción')
-
-# image_no_pred = Image.open('auxiliar/af.jpg')
-
 with open(f'{code_dir}/auxiliar/vectorizer.pickle', 'rb') as handle:
     vectorizer = pickle.load(handle)
 
@@ -54,7 +37,7 @@ with open(f'{code_dir}/auxiliar/modelo_lr.pickle', 'rb') as handle:
     lr = pickle.load(handle)
 
     
-base_completa=pd.read_csv('auxiliar/base_completa.csv')
+base_completa=pd.read_csv(f'{code_dir}/auxiliar/base_completa.csv')
 
 frases_random=[]
 for discurso,clase in zip(base_completa['texto'],base_completa['clase']):
@@ -115,23 +98,23 @@ if predecir and len(title)>0:
     test_pred = lr.predict_proba(test_prueba_t)
     if test_pred[0][0]>test_pred[0][1]:
         res=test_pred[0][0]
-        image_pred = Image.open('auxiliar/mm.jpg')
-        image_no_pred = Image.open('auxiliar/af.jpg')
+        image_pred = Image.open(f'{code_dir}/auxiliar/mm.jpg')
+        image_no_pred = Image.open(f'{code_dir}/auxiliar/af.jpg')
         presidente='Mauricio Macri'
         if st.session_state.clase_real==0:
-            ruta_icono='auxiliar/right.jpg'
+            ruta_icono=f'{code_dir}/auxiliar/right.jpg'
         else:                   
-            ruta_icono='auxiliar/wrong.jpg'
+            ruta_icono=f'{code_dir}/auxiliar/wrong.jpg'
 
     else:
         res=test_pred[0][1]
-        image_pred = Image.open('auxiliar/af.jpg')
-        image_no_pred = Image.open('auxiliar/mm.jpg')
+        image_pred = Image.open(f'{code_dir}/auxiliar/af.jpg')
+        image_no_pred = Image.open(f'{code_dir}/auxiliar/mm.jpg')
         presidente='Alberto Fernández'
         if st.session_state.clase_real==1:
-            ruta_icono='auxiliar/right.jpg'
+            ruta_icono=f'{code_dir}/auxiliar/right.jpg'
         else:                   
-            ruta_icono='auxiliar/wrong.jpg'
+            ruta_icono=f'{code_dir}/auxiliar/wrong.jpg'
 
 
     tab3.write(f"El discurso corresponde a {presidente}, con un {res:.1%} de probabilidad.")
@@ -142,7 +125,7 @@ if predecir and len(title)>0:
 
     if st.session_state.clase_real!=999:
         with col2:
-            if ruta_icono=='auxiliar/right.jpg':
+            if ruta_icono==f'{code_dir}/auxiliar/right.jpg':
                 st.image(image_pred, width=130,caption='Real')
             else:
                 st.image(image_no_pred, width=130,caption='Real')
