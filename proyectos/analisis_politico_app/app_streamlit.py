@@ -5,6 +5,8 @@ import nltk
 from PIL import Image
 import random
 import pathlib
+import sklearn
+
 code_dir = pathlib.Path(__file__).parent.resolve()
 
 # print(code_dir)
