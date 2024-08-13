@@ -8,7 +8,7 @@ import path
 import os
 
 print(os.getcwd())
-st.text(Path.cwd())
+# st.text(Path.cwd())
 st.text(os.getcwd())
 
 # dir = path.Path(__file__).abspath()
