@@ -10,6 +10,7 @@ import os
 print(os.getcwd())
 # st.text(Path.cwd())
 st.text(os.getcwd())
+ruta=os.getcwd()
 
 # dir = path.Path(__file__).abspath()
 # sys.path.append(dir.parent.parent)
@@ -35,7 +36,8 @@ class Tokenizer(object):
 # test_prueba='Hay oportunidades de buscar un cambio. Gracias por el entusiasmo'
 # test_prueba=test.loc[230,'texto']
 
-image_no_pred = Image.open('af.jpg')
+image_no_pred = Image.open(ruta+'/af.jpg')
+st.image(image_no_pred, width=130,caption='Predicción')
 
 image_no_pred = Image.open('./auxiliar/af.jpg')
 
