@@ -26,7 +26,7 @@ class Tokenizer(object):
 # test_prueba='Hay oportunidades de buscar un cambio. Gracias por el entusiasmo'
 # test_prueba=test.loc[230,'texto']
 
-image_no_pred = Image.open('auxiliar/af.jpg')
+image_no_pred = Image.open('/auxiliar/af.jpg')
 
 with open('auxiliar/vectorizer.pickle', 'rb') as handle:
     vectorizer = pickle.load(handle)
