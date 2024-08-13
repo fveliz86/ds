@@ -6,8 +6,10 @@ from PIL import Image
 import random
 import path
 
+print(os.getcwd())
+
 dir = path.Path(__file__).abspath()
-sys.append.path(dir.parent.parent)
+sys.path.append(dir.parent.parent)
 
 class Tokenizer(object):
     def __init__(self,stopwords):
