@@ -6,6 +6,9 @@ from PIL import Image
 import random
 import path
 
+dir = path.Path(__file__).abspath()
+sys.append.path(dir.parent.parent)
+
 class Tokenizer(object):
     def __init__(self,stopwords):
         nltk.download('punkt', quiet=True, raise_on_error=True)
