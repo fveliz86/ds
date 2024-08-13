@@ -42,15 +42,15 @@ class Tokenizer(object):
 # test_prueba='Hay oportunidades de buscar un cambio. Gracias por el entusiasmo'
 # test_prueba=test.loc[230,'texto']
 
-image_no_pred = Image.open('analisis_politico_app/auxiliar/af.jpg')
+image_no_pred = Image.open(f'{code_dir}/auxiliar/af.jpg')
 st.image(image_no_pred, width=130,caption='Predicción')
 
 # image_no_pred = Image.open('auxiliar/af.jpg')
 
-with open('auxiliar/vectorizer.pickle', 'rb') as handle:
+with open(f'{code_dir}/auxiliar/vectorizer.pickle', 'rb') as handle:
     vectorizer = pickle.load(handle)
 
-with open('auxiliar/modelo_lr.pickle', 'rb') as handle:
+with open(f'{code_dir}/auxiliar/modelo_lr.pickle', 'rb') as handle:
     lr = pickle.load(handle)
 
     
