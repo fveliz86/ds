@@ -4,6 +4,7 @@ import pandas as pd
 import nltk
 from PIL import Image
 import random
+import path
 
 class Tokenizer(object):
     def __init__(self,stopwords):
