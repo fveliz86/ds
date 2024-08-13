@@ -7,6 +7,11 @@ import random
 import path
 import os
 
+
+import pathlib
+code_dir = pathlib.Path(__file__).parent.resolve()
+st.text(code_dir)
+
 print(os.getcwd())
 # st.text(Path.cwd())
 st.text(os.getcwd())
