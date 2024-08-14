@@ -1,3 +1,26 @@
+class GlobalsHelper:
+    """Helper to retrieve globals.
+
+    Helpful for global caching of certain variables that can be expensive to load.
+    (e.g. tokenization)
+
+    """
+
+    _stopwords: Optional[List[str]] = None
+    _nltk_data_dir: Optional[str] = None
+
+    def __init__(self) -> None:
+        """Initialize NLTK stopwords and punkt."""
+        import nltk
+
+        self._nltk_data_dir = os.environ.get(
+            "NLTK_DATA",
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "_static/nltk_cache",
+            ),
+        )
+        
 import streamlit as st
 import pickle
 import pandas as pd
