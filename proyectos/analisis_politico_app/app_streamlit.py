@@ -6,9 +6,11 @@ from PIL import Image
 import random
 import pathlib
 import sklearn
+import tempfile
 
-nltk.download('stopwords', quiet=True, raise_on_error=True)
-nltk.download('punkt')
+nltk.download('stopwords', quiet=True, raise_on_error=True, download_dir=tempfile.gettempdir())
+nltk.download('punkt', download_dir=tempfile.gettempdir())
+nltk.data.path.append(tempfile.gettempdir())
 
 code_dir = pathlib.Path(__file__).parent.resolve()
 
