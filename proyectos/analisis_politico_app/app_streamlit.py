@@ -7,6 +7,7 @@ import random
 import pathlib
 import sklearn
 import tempfile
+import os
 
 # nltk.download('stopwords', download_dir=tempfile.gettempdir())
 # nltk.download('punkt', download_dir=tempfile.gettempdir())
