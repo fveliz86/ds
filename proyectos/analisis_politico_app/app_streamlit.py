@@ -8,12 +8,19 @@ import pathlib
 import sklearn
 import tempfile
 
-nltk.download('stopwords', quiet=True, raise_on_error=True, download_dir=tempfile.gettempdir())
-nltk.download('punkt', download_dir=tempfile.gettempdir())
-nltk.data.path.append(tempfile.gettempdir())
+# nltk.download('stopwords', download_dir=tempfile.gettempdir())
+# nltk.download('punkt', download_dir=tempfile.gettempdir())
+# nltk.data.path.append(tempfile.gettempdir())
+# st.text(tempfile.gettempdir())
 
-st.text(tempfile.gettempdir())
-    
+nltk_data_dir = "./resources/nltk_data_dir/"
+if not os.path.exists(nltk_data_dir):
+    os.makedirs(nltk_data_dir, exist_ok=True)
+nltk.data.path.clear()
+nltk.data.path.append(nltk_data_dir)
+nltk.download("stopwords", download_dir=nltk_data_dir)
+nltk.download('punkt', download_dir=nltk_data_dir)
+
 code_dir = pathlib.Path(__file__).parent.resolve()
 
 # print(code_dir)
