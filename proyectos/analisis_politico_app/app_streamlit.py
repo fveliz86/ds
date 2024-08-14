@@ -23,13 +23,15 @@ nltk.data.path.append(nltk_data_dir)
 nltk.download("stopwords", download_dir=nltk_data_dir)
 nltk.download('punkt', download_dir=nltk_data_dir)
 
+
+
 code_dir = pathlib.Path(__file__).parent.resolve()
 
 # print(code_dir)
 
 class Tokenizer(object):
     def __init__(self,stopwords):
-        nltk.download('punkt', quiet=True, raise_on_error=True)
+        nltk.download('punkt', download_dir=tempfile.gettempdir())
         self.stemmer = nltk.stem.PorterStemmer()
         self.stopwords=stopwords
         
