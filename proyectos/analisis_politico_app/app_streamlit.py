@@ -12,6 +12,8 @@ nltk.download('stopwords', quiet=True, raise_on_error=True, download_dir=tempfil
 nltk.download('punkt', download_dir=tempfile.gettempdir())
 nltk.data.path.append(tempfile.gettempdir())
 
+st.text(tempfile.gettempdir())
+    
 code_dir = pathlib.Path(__file__).parent.resolve()
 
 # print(code_dir)
