@@ -12,6 +12,10 @@ from openai import OpenAI
 import plotly.express as px
 import plotly.graph_objects as go
 import time
+from dotenv import load_dotenv
+import os
+import requests
+
 
 st.set_page_config(layout="wide")
 
@@ -215,10 +219,26 @@ def limpiar_discurso_juego():
 
 def genai_func(discurso_juego):
 
+    # Cargar .env solo si existe
+    if os.path.exists(".env"):
+        load_dotenv()
+
+    # Tomar la API key desde variable de entorno (ya sea .env o GitHub Secret)
+    api_key = os.getenv("OPENROUTER_API_KEY")
+
+    if not api_key:
+        raise ValueError("No se encontró OPENROUTER_API_KEY. Configurá .env o GitHub Secret.")
+
+    print("API Key cargada:", api_key[:8] + "...")  # no mostrar toda la key
+
+    # # Cargar variables desde .env
+    # load_dotenv()
+    # api_key = os.getenv("OPENROUTER_API_KEY")
+
     try:
         client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-        api_key="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",
+        api_key=api_key,
         )
 
         completion = client.chat.completions.create(
