@@ -21,6 +21,11 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
+    - name: Debug environment
+      run: echo "OPENROUTER_API_KEY está definida? $([[ -n $OPENROUTER_API_KEY ]] && echo 'Sí' || echo 'No')"
+      env:
+        OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
     - name: Run my script
       env:
         OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
