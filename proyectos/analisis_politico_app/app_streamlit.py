@@ -175,9 +175,10 @@ def click_button():
 
 def traer_clicked():
     discurso_prueba=random.choice(frases_random)
-    discursos_sin_nombres=discurso_prueba[0]
-    for i in nombres_propios:
-        discursos_sin_nombres = discursos_sin_nombres.replace(i,'...')
+    tokens = nltk.word_tokenize(discurso_prueba[0])
+    tokens2=[i if i not in nombres_propios else ' ... ' for i in tokens]
+    discursos_sin_nombres = TreebankWordDetokenizer().detokenize(tokens2)
+
     st.session_state.discurso = discursos_sin_nombres
     st.session_state.clase_real=discurso_prueba[1]
 
@@ -187,9 +188,6 @@ def iniciar_clicked_fn():
     ind_random=random.choice(range(len(frases_random)))
     discurso_prueba=frases_random[ind_random]
     st.session_state.link=base.loc[base.index==discurso_prueba[2],'link'].values[0]
-    # discursos_sin_nombres=discurso_prueba[0]
-    # for i in nombres_propios:
-    #     discursos_sin_nombres = discursos_sin_nombres.replace(i,'...')
 
     tokens = nltk.word_tokenize(discurso_prueba[0])
     tokens2=[i if i not in nombres_propios else ' ... ' for i in tokens]
@@ -220,12 +218,13 @@ def genai_func(discurso_juego):
     try:
         client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-        api_key="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",
+        api_key="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",
         )
 
         completion = client.chat.completions.create(
         extra_body={},
-        model="meta-llama/llama-4-maverick:free",
+        # model="meta-llama/llama-4-maverick:free",
+        model="deepseek/deepseek-r1-distill-llama-70b:free",
         messages=
         [
             {
@@ -335,12 +334,12 @@ discurso_edi = tab3.text_area('Ingresar discurso:','',key='discurso',height=160,
 col1, col2, col3= tab3.columns(3)
 
 traer=col1.button('Traer discurso al azar',on_click=traer_clicked)
-generar=col2.button('Generar discurso nuevo')
+generar=col2.button('Generar discurso nuevo - PRÓXIMAMENTE')
 predecir=col3.button('Predecir', on_click=click_button)
 # st.write(st.session_state.predecir_clicked)
 
-if predecir and len(discurso)>0:
-    predecir_fn(discurso_edi)
+if predecir and len(st.session_state.discurso)>0:
+    predecir_fn(st.session_state.discurso)
     tab3.write(f"El discurso corresponde a {presidentes[st.session_state.res]}, con un {st.session_state.prob:.1%} de probabilidad.")
 
     col1, col2, col3= tab3.columns(3)
@@ -412,16 +411,16 @@ if st.session_state.iniciar_clicked:
 
         if ranking==1:
             imagen_res=f'{code_dir}/auxiliar/1er puesto.png'
-            texto=f'¡Felicitaciones! Haz logrado el 1er puesto con un {puntaje}% de aciertos. Eres un auténtico Maquiavelo del análisis político.'
+            texto=f'¡Felicitaciones! Haz logrado el 1er puesto con un {puntaje}% de aciertos.\n¡Eres un auténtico Maquiavelo del análisis político!'
         elif ranking==2:
             imagen_res=f'{code_dir}/auxiliar/2do puesto.png'
-            texto=f'¡Muy bien! Haz logrado el 2do puesto con un {puntaje}% de aciertos. No sos el más agudo analista político, pero estás bien encaminado.'
+            texto=f'¡Muy bien! Haz logrado el 2do puesto con un {puntaje}% de aciertos.\nNo sos el más agudo analista político, ¡pero estás bien encaminado!'
         else:
             imagen_res=f'{code_dir}/auxiliar/3er puesto.png'
-            texto=f'Haz logrado el 3er puesto con un {puntaje}% de aciertos. Fuiste derrotado tanto por un modelo de análisis de textos como por un LLM de GenAI.\n¡No te rindas y volvé a participar!'
+            texto=f'Haz logrado el 3er puesto con un {puntaje}% de aciertos.\nFuiste derrotado tanto por un modelo de análisis de textos como por un LLM de GenAI.\n¡No te rindas y volvé a participar!'
 
         if (ranking<3) and (len(mismo_puesto))>0:
-            texto+=f'\nCompartiste el puesto con {" y ".join(mismo_puesto)}.'
+            texto+=f'\n\n¡Ojo! Compartiste el puesto con {" y ".join(mismo_puesto)}.'
 
         col1, col2, col3= tab4.columns([0.33,0.33,0.33])
         col2.image(Image.open(imagen_res), width=400,caption=texto)
