@@ -51,11 +51,15 @@ with open(f'{code_dir}/auxiliar/modelo_lr.pickle', 'rb') as handle:
     
 base=pd.read_csv(f'{code_dir}/auxiliar/base_original_test.csv')
 
+from pathlib import Path
+
 rutas_img=[f'{code_dir}/auxiliar/mm.jpg',f'{code_dir}/auxiliar/af.jpg']
 rutas_icono=[f'{code_dir}/auxiliar/wrong.jpg',f'{code_dir}/auxiliar/right.jpg']
 presidentes=['Mauricio Macri','Alberto Fernández']
 with open(f'{code_dir}/auxiliar/nombres_propios_completo.pickle', 'rb') as handle:
         nombres_propios = pickle.load(handle)
+
+
 
 
 frases_random=[]
@@ -485,7 +489,9 @@ if st.session_state.iniciar_clicked:
             col13b.image(Image.open(rutas_icono[st.session_state.acierto_lista[2]]), width=130)
             
             col2.subheader(':dart: Respuesta correcta')
-            col2.image(Image.open(rutas_img[st.session_state.clase_real]), width=130, caption='Real')
+            img_path = Path(rutas_img[st.session_state.clase_real])
+            # col2.image(Image.open(rutas_img[st.session_state.clase_real]), width=130, caption='Real')
+            col2.image(Image.open(img_path), width=130, caption='Real')
 
 
 # if st.session_state.pred!=-1:
